@@ -23,16 +23,13 @@ class Index extends \Magento\Backend\App\Action
     }
 
     /**
-     *
-     * @return \Magento\Framework\View\Result\Page
+     * @return void
      */
     public function execute()
     {
-
         $this->_view->loadLayout();
         $this->_setActiveMenu('Magento_Backend::system');
         $this->_view->getPage()->getConfig()->getTitle()->prepend(__('Log Viewer'));
         $this->_view->renderLayout();
-
     }
 }
