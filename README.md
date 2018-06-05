@@ -12,4 +12,4 @@ Simple module to allow admins to download log files via System > LogViewer.
 ![Preview Image](https://i.imgur.com/yJLiScN.png "Preview of LogViewer")
 
 **Log Preview**
-![Preview Image](https://i.imgur.com/QD38PHS.png "Preview of LogViewer")
+![Preview Image](/doc/view.png "Preview of LogViewer")
