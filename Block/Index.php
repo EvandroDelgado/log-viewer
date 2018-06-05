@@ -30,11 +30,11 @@ class Index extends \Magento\Framework\View\Element\Template
 
     public function downloadLogFiles($fileName)
     {
-        return $this->getUrl('logviewer/download/getfile', [$fileName]);
+        return $this->getUrl('logviewer/download/getfile', ['file' => $fileName]);
     }
 
     public function previewLogFile($fileName)
     {
-        return $this->getUrl('logviewer/view/index', [$fileName]);
+        return $this->getUrl('logviewer/view/index', ['file' => $fileName]);
     }
 }

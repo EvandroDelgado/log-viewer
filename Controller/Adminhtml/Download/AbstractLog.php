@@ -21,8 +21,7 @@ abstract class AbstractLog extends System
 
     public function execute()
     {
-        $param = $this->getRequest()->getParams();
-        $filePath = $this->getFilePathWithFile($param[0]);
+        $filePath = $this->getFilePathWithFile($this->getRequest()->getParam('file'));
 
         $filter   = new Zend_Filter_BaseName();
         $fileName = $filter->filter($filePath);

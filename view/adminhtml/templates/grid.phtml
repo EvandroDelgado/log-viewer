@@ -1,3 +1,4 @@
+<?php /** @var $block \PhilTurner\LogViewer\Block\Index */ ?>
 <?php $logs = $block->getLogFiles(); ?>
 
 <section class="admin__page-section">
@@ -16,7 +17,7 @@
                 </tr>
             <?php foreach($logs as $log) { ?>
                 <tr>
-                    <td><a href="<?php echo $block->downloadLogFiles($log['name']); ?>"><?php echo $log['name'] ?></a></td>
+                    <td><a href="<?php echo $block->previewLogFile($log['name']); ?>"><?php echo $log['name'] ?></a></td>
                     <td>var/log</td>
                     <td><?php echo $log['filesize'] ?></td>
                     <td><?php echo $log['modTimeLong'] ?></td>
@@ -26,7 +27,7 @@
                     </td>
                 </tr>
             <?php } ?>
-            </table><br>
+            </table>
         </div>
     </div>
 </section>

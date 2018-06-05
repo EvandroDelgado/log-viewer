@@ -23,23 +23,36 @@ class Data extends AbstractHelper
     }
 
     /**
+     * Get path to var/log directory
+     *
      * @return string
      */
     public function getPath()
     {
-        $rootPath = $this->directoryList->getRoot();
-        $path =
-            $rootPath . DIRECTORY_SEPARATOR . 'var' . DIRECTORY_SEPARATOR . 'log'. DIRECTORY_SEPARATOR;
-        return $path;
+        return $this->directoryList->getPath('log');
     }
 
     /**
      * @return array
      */
-    protected function getLogFiles()
+    protected function getLogFiles($path)
     {
-        $path = $this->getPath();
-        return scandir($path);
+        $list = scandir($path);
+        //remove rubbish from array
+        array_splice($list, 0, 2);
+
+        $output = [];
+        foreach ($list as $index => $file) {
+            if (is_dir($path.DIRECTORY_SEPARATOR.$file)) {
+                foreach ($this->getLogFiles($path.DIRECTORY_SEPARATOR.$file) as $childFile) {
+                    $output[] = $file.DIRECTORY_SEPARATOR.$childFile;
+                }
+            } else {
+                $output[] = $file;
+            }
+        }
+
+        return $output;
     }
 
     /**
@@ -67,14 +80,10 @@ class Data extends AbstractHelper
     {
         $maxNumOfLogs = 30;
         $logFileData = [];
-        $path = $this->getPath();
-        $files = $this->getLogFiles();
-
-        //remove rubbish from array
-        array_splice($files, 0, 2);
+        $path = $this->getPath().DIRECTORY_SEPARATOR;
 
         //build log data into array
-        foreach ($files as $file) {
+        foreach ($this->getLogFiles($this->getPath()) as $file) {
             $logFileData[$file]['name'] = $file;
             $logFileData[$file]['filesize'] = $this->filesizeToReadableString((filesize($path . $file)));
             $logFileData[$file]['modTime'] = filemtime($path . $file);

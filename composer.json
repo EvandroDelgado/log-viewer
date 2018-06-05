@@ -9,7 +9,7 @@
       "registration.php"
     ],
     "psr-4": {
-      "\\PhilTurner\\LogViewer\\": ""
+      "PhilTurner\\LogViewer\\": ""
     }
   },
   "authors": [

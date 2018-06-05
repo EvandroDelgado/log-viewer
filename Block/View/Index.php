@@ -1,8 +1,14 @@
 <?php
 namespace PhilTurner\LogViewer\Block\View;
 
+use PhilTurner\LogViewer\Helper\ReadLogFileTrait;
+
 class Index extends \Magento\Framework\View\Element\Template
 {
+    use ReadLogFileTrait {
+        fetch as fetchLogFileBlocks;
+    }
+
     /**
      * @var \PhilTurner\LogViewer\Helper\Data
      */
@@ -25,14 +31,105 @@ class Index extends \Magento\Framework\View\Element\Template
 
     public function getLogFile()
     {
-        $params = $this->_request->getParams();
-        return $this->logDataHelper->getLastLinesOfFile($params[0], 10);
+        return $this->logDataHelper->getLastLinesOfFile($this->getFileName(), 10);
+    }
+
+    /**
+     * Get logs
+     *
+     * @return array
+     */
+    public function getLogFileBlocks(): array
+    {
+        return $this->fetchLogFileBlocks($this->logFile(), $this->getLimit(), $this->getStart());
+    }
+
+    public function getLimit(): int
+    {
+        return (int)$this->getRequest()->getParam('limit', 10) ?: 10;
+    }
+
+    public function getStart(): int
+    {
+        return (int)$this->getRequest()->getParam('start', 0);
     }
 
     public function getFileName()
     {
-        $params = $this->_request->getParams();
-        return $params[0];
+        return $this->getRequest()->getParam('file');
+    }
+
+    /**
+     * Get limit URL
+     *
+     * @param int $limit
+     * @return string
+     */
+    public function getLimitUrl(int $limit): string
+    {
+        return $this->getUrl('*/*/*', ['_current' => true, 'limit' => $limit]);
+    }
+
+    /**
+     * Get start URL
+     *
+     * @param int $start
+     * @return string
+     */
+    public function getStartUrl(int $start): string
+    {
+        return $this->getUrl('*/*/*', ['_current' => true, '_use_rewrite' => true, 'start' => $start]);
+    }
+
+    /**
+     * Get back URL
+     *
+     * @return string
+     */
+    public function getBackUrl(): string
+    {
+        return $this->getUrl('*/grid/', ['_current' => true]);
+    }
+
+    /**
+     * Get full path to log file
+     *
+     * @return string
+     */
+    private function logFile(): string
+    {
+        return $this->logDataHelper->getPath().DIRECTORY_SEPARATOR.$this->getFileName();
+    }
+
+    /**
+     * Get starts list
+     *
+     * @param int $max
+     * @return array
+     */
+    public function getStarts($max = 10)
+    {
+        $start = $this->getStart() - $this->getLimit() * 2;
+        $start = $start > 0 ? $start : 0;
+        if ($start > $this->getLimit() * 3) {
+            $step = ceil($start / 4);
+            $step -= $step % $this->getLimit();
+            return array_merge(
+                range(0, $start - $this->getLimit(), $step),
+                range($start, $this->getLimit() * ($max - 1) + $start, $this->getLimit())
+            );
+        }
+        return range(0, $this->getLimit() * ($max - 1) + $start, $this->getLimit());
+    }
+
+    /**
+     * Get starts list
+     *
+     * @return array
+     */
+    public function getLimits()
+    {
+        return [10, 20, 30, 50, 100, 500, 1000];
     }
 
 }
