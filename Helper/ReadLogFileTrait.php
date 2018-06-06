@@ -24,7 +24,6 @@ trait ReadLogFileTrait
         $output     = [];
         $block      = 0;
         $blockStamp = null;
-        $started = false;
 
         foreach ($this->fileReader()($file) as $line) {
             //match next log file text block by timestamp
@@ -41,9 +40,10 @@ trait ReadLogFileTrait
                 while (isset($output[$blockStamp])) {
                     $blockStamp = $matches[1].'.'.++$i;
                 }
+
                 $line                = str_replace($matches[0].' ', '', $line); // cut timestamp out
                 $output[$blockStamp] = $line.PHP_EOL;
-            } elseif ($started) {
+            } elseif ($output) {
                 $output[$blockStamp] .= $line.PHP_EOL;
             }
         }
@@ -63,7 +63,7 @@ trait ReadLogFileTrait
                 throw new Exception('LFI protection. Parent directory is prohibited to use.');
             }
 
-            $rs = fopen($file, 'r');
+            $rs = @fopen($file, 'r');
 
             if (!$rs) {
                 throw new Exception('Cannot open file: '.$file);

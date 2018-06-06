@@ -1,4 +1,5 @@
 <?php
+
 namespace PhilTurner\LogViewer\Block\View;
 
 use PhilTurner\LogViewer\Helper\ReadLogFileTrait;
@@ -16,8 +17,8 @@ class Index extends \Magento\Framework\View\Element\Template
 
     /**
      * @param \Magento\Framework\View\Element\Template\Context $context
-     * @param \PhilTurner\LogViewer\Helper\Data $logDataHelper
-     * @param array $data
+     * @param \PhilTurner\LogViewer\Helper\Data                $logDataHelper
+     * @param array                                            $data
      */
     public function __construct(
         \Magento\Framework\View\Element\Template\Context $context,
@@ -46,12 +47,12 @@ class Index extends \Magento\Framework\View\Element\Template
 
     public function getLimit(): int
     {
-        return (int)$this->getRequest()->getParam('limit', 10) ?: 10;
+        return (int) $this->getRequest()->getParam('limit', 10) ?: 10;
     }
 
     public function getStart(): int
     {
-        return (int)$this->getRequest()->getParam('start', 0);
+        return (int) $this->getRequest()->getParam('start', 0);
     }
 
     public function getFileName()
@@ -67,7 +68,11 @@ class Index extends \Magento\Framework\View\Element\Template
      */
     public function getLimitUrl(int $limit): string
     {
-        return $this->getUrl('*/*/*', ['_current' => true, 'limit' => $limit]);
+        return $this->getUrl('*/*/*', [
+            '_current' => true,
+            'limit'    => $limit,
+            'file'     => $this->getFileName(),
+        ]);
     }
 
     /**
@@ -78,7 +83,11 @@ class Index extends \Magento\Framework\View\Element\Template
      */
     public function getStartUrl(int $start): string
     {
-        return $this->getUrl('*/*/*', ['_current' => true, '_use_rewrite' => true, 'start' => $start]);
+        return $this->getUrl('*/*/*', [
+            '_current'     => true,
+            'start'        => $start,
+            'file'         => $this->getFileName(),
+        ]);
     }
 
     /**
@@ -89,16 +98,6 @@ class Index extends \Magento\Framework\View\Element\Template
     public function getBackUrl(): string
     {
         return $this->getUrl('*/grid/', ['_current' => true]);
-    }
-
-    /**
-     * Get full path to log file
-     *
-     * @return string
-     */
-    private function logFile(): string
-    {
-        return $this->logDataHelper->getPath().DIRECTORY_SEPARATOR.$this->getFileName();
     }
 
     /**
@@ -114,11 +113,13 @@ class Index extends \Magento\Framework\View\Element\Template
         if ($start > $this->getLimit() * 3) {
             $step = ceil($start / 4);
             $step -= $step % $this->getLimit();
+
             return array_merge(
                 range(0, $start - $this->getLimit(), $step),
                 range($start, $this->getLimit() * ($max - 1) + $start, $this->getLimit())
             );
         }
+
         return range(0, $this->getLimit() * ($max - 1) + $start, $this->getLimit());
     }
 
@@ -130,6 +131,16 @@ class Index extends \Magento\Framework\View\Element\Template
     public function getLimits()
     {
         return [10, 20, 30, 50, 100, 500, 1000];
+    }
+
+    /**
+     * Get full path to log file
+     *
+     * @return string
+     */
+    private function logFile(): string
+    {
+        return $this->logDataHelper->getPath().DIRECTORY_SEPARATOR.$this->getFileName();
     }
 
 }
